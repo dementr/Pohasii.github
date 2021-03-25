@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
+<body style="height: 100%">
 
 <canvas id="canvas"></canvas>
 
@@ -141,17 +141,19 @@
         }
 
     }
+
     class Columns {
 
         constructor(canvasWidth = 800,
                     canvasHeight = 800,
                     speed = 5,
                     count = 5,
-                    width = {min: 50, max: 150},
-                    passage = {start: 100, finish: 220}) {
+                    // width = {min: 50, max: 150},
+                    //passage = {start: 100, finish: 220}
+                    ) {
             this.count = count
-            this.width = width
-            this.passage = passage
+            this.width = {min: canvasWidth/15, max: canvasWidth/10}// width
+            this.passage = {start: canvasHeight/9, finish: canvasHeight/6} // passage
             this.moveSpeed = speed
             this.canvasWidth = canvasWidth
             this.canvasHeight = canvasHeight
@@ -242,10 +244,11 @@
     const canvas = document.getElementById('canvas');
 
     let canWindow
-
+    // width: window.innerWidth - 50, height: window.innerHeight - 50
     if (canvas.getContext) {
-        canWindow = new Can(canvas.getContext('2d'), {width: window.innerWidth - 50, height: window.innerHeight - 50})
+        canWindow = new Can(canvas.getContext('2d'), {width: document.body.clientWidth - 50, height: document.body.clientHeight - 50})
     }
+
 
         if (canWindow.status) {
 
@@ -254,8 +257,8 @@
                 canWindow.size.height,
                 canWindow.size.height / 5, // speed
                 5,
-                width = {min: 50, max: 250},
-                passage = {start: 160, finish: 300}
+                //width = {min: 50, max: 250},
+                //passage = {start: 160, finish: 300}
             )
 
             let bird = new Player(
