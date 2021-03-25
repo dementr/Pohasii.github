@@ -250,28 +250,28 @@
     }
 
 
-        if (canWindow.status) {
+    if (canWindow.status) {
 
-            let columns = new Columns(
-                canWindow.size.width,
-                canWindow.size.height,
-                7, // speed
-                5,
-                //width = {min: 50, max: 250},
-                //passage = {start: 160, finish: 300}
-            )
+        const columns = new Columns(
+            canWindow.size.width,
+            canWindow.size.height,
+            7, // speed
+            5,
+            //width = {min: 50, max: 250},
+            //passage = {start: 160, finish: 300}
+        );
 
-            let bird = new Player(
-                canWindow.size.height / 2, // speed
-                canWindow.size.width,
-                canWindow.size.height,
-                40,
-                25,
-                canWindow.size.height / 2 // gravity
+        const bird = new Player(
+            canWindow.size.height / 2, // speed
+            canWindow.size.width,
+            canWindow.size.height,
+            40,
+            25,
+            canWindow.size.height / 2 // gravity
 
-            )
+        );
 
-            document.addEventListener('keydown', function(event){
+        document.addEventListener('keydown', function(event){
                 if (event.defaultPrevented) {
                     return; // Do nothing if the event was already processed
                 }
