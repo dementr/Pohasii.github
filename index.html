@@ -153,8 +153,8 @@
                     ) {
             this.count = count
             this.width = {min: canvasWidth/15, max: canvasWidth/10}// width
-            this.passage = {start: canvasHeight/9, finish: canvasHeight/6} // passage
-            this.moveSpeed = speed
+            this.passage = {start: canvasHeight/9, finish: canvasHeight/6 } // passage
+            this.moveSpeed = Math.abs(canvasWidth / 60 * speed) // speed
             this.canvasWidth = canvasWidth
             this.canvasHeight = canvasHeight
             this.columns = []
@@ -255,7 +255,7 @@
             let columns = new Columns(
                 canWindow.size.width,
                 canWindow.size.height,
-                canWindow.size.height / 5, // speed
+                7, // speed
                 5,
                 //width = {min: 50, max: 250},
                 //passage = {start: 160, finish: 300}
