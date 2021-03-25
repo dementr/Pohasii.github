@@ -1,11 +1,331 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>wombats inc</title>
-  </head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>kyky</p>
-<img src="/wombat_1x.png" alt="hidde">
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+    const CountOfFrame = 60
+    let Time = 1000
+    let Status = true
+
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+    }
+
+    class Player {
+        constructor(speed = 25, canvasWidth = 800, canvasHeight = 800, sizeWidth = 40, sizeHeight = 25, gravity = 15) {
+            this.canvasWidth = canvasWidth
+            this.canvasHeight = canvasHeight
+            this.positionX = canvasWidth/2 - sizeWidth/2
+            this.positionY = canvasHeight/2 - sizeHeight/2
+            this.speed = speed
+            this.sizeWidth = sizeWidth
+            this.sizeHeight = sizeHeight
+            this.gravity = gravity
+            this.status = true
+            this.newPositionY = 0
+            this.jumpStatus = false
+            this.count = 0
+        }
+
+        Calculation (columns) {
+            if (this.jumpStatus) {
+                this.positionY = this.positionY - this.speed/CountOfFrame
+                if (this.positionY < this.newPositionY) {
+                    this.jumpStatus = false
+                }
+            } else {
+                this.positionY = this.positionY + this.gravity/CountOfFrame
+            }
+
+            this.coliseum(columns)
+
+            if (this.positionY > this.canvasHeight || this.positionY < 0) {
+                this.status = false
+            }
+        }
+
+        get ForDraw () {
+            return {
+                x: this.positionX - this.sizeWidth,
+                y: this.positionY - this.sizeHeight,
+                width: this.sizeWidth,
+                height: this.sizeHeight,
+                type: "player"
+            }
+        }
+
+        get Points () {
+            return {
+                x: this.positionX - this.sizeWidth + 10,
+                y: this.positionY - this.sizeHeight + 10,
+                points: this.count,
+                type: "points"
+            }
+        }
+        get Status () {
+            return this.status
+        }
+
+        get JumpStatus () {
+            return this.jumpStatus
+        }
+
+        Jump () {
+            if (this.jumpStatus === true) {
+                this.newPositionY = this.newPositionY - (this.speed / 3)
+                return
+            }
+            this.jumpStatus = true
+            this.newPositionY = this.positionY - (this.speed /3)
+        }
+        coliseum (columns) {
+            columns.forEach(function (item) {
+                let x = this.positionX - this.sizeWidth
+                let y = this.positionY - this.sizeHeight
+                // console.log(`x:${x} y: ${y} positionX:${this.positionX} positionX: ${this.positionX}`)
+                let horizontalBorder = this.sizeWidth // Math.abs(this.sizeWidth / 1)
+                let VerticalBorder = this.sizeHeight
+                if (this.status && x + horizontalBorder >= item.positionX && x <= item.positionX + item.width) {
+                    if (y < item.passage.start || y + VerticalBorder > item.passage.finish){
+                        this.status = false
+                    }
+                }
+                if (x > item.positionX + item.width && item.countStatus === false) {
+                    this.count++
+                    item.countStatus = true
+                }
+            }, this)
+        }
+    }
+
+    class Can {
+        constructor (context, size = {width: 800, height: 800})  {
+            this.context = context
+            this.size = size
+            this.status = true
+        }
+
+        Draw (columns) {
+            columns.forEach((obj) => {
+                switch (obj.type) {
+                    case "player":
+                        this.context.fillStyle = 'yellow'
+                        this.context.fillRect(obj.x, obj.y, obj.width, obj.height)
+                        break
+                    case "points":
+                        this.context.fillStyle = 'black'
+                        this.context.fillText(obj.points, obj.x, obj.y)
+                        break
+                    case "column":
+                        this.context.fillStyle = 'green'
+                        this.context.fillRect(obj.x, obj.y, obj.width, obj.height)
+                        break
+                    default: console.log("error draw")
+                }
+            })
+
+        }
+
+        update () {
+            this.context.canvas.width = this.size.width
+            this.context.canvas.height = this.size.height
+        }
+
+    }
+    class Columns {
+
+        constructor(canvasWidth = 800,
+                    canvasHeight = 800,
+                    speed = 5,
+                    count = 5,
+                    width = {min: 50, max: 150},
+                    passage = {start: 100, finish: 220}) {
+            this.count = count
+            this.width = width
+            this.passage = passage
+            this.moveSpeed = speed
+            this.canvasWidth = canvasWidth
+            this.canvasHeight = canvasHeight
+            this.columns = []
+            this.columnsForDraw = []
+        }
+
+        PushNew () {
+            let width = getRandomIntInclusive(this.width.min, this.width.max)
+            let passageSizeHeight = getRandomIntInclusive(this.passage.start, this.passage.finish)
+            let positionPassage = getRandomIntInclusive(0, this.canvasHeight - passageSizeHeight)
+            let passage = {start: positionPassage, finish: positionPassage + passageSizeHeight}
+
+            let xForColumn = this.canvasWidth
+            this.columns.push({
+                positionX: xForColumn,
+                positionY: 0,
+                width: width,
+                passage: passage,
+                countStatus: false,
+                type: "column"
+            })
+        }
+
+        RemoveFirst ()  {
+            if (this.columns.length > 0) {
+                this.columns.shift()
+            }
+        }
+
+        get GetDrawColumns () {
+            return this.columnsForDraw
+        }
+        get GetColumns () {
+            return this.columns
+        }
+        Calculating () {
+
+            let newStateForColumnsForDraw = []
+            this.columns.forEach(function (column, index) {
+
+                this.columns[index].positionX = column.positionX - this.moveSpeed/CountOfFrame
+                if (this.columns[index].positionX + column.width < 0) {
+                    this.RemoveFirst()
+                }
+
+                let first = {
+                    x: this.columns[index].positionX,
+                    y: column.positionY,
+                    width: column.width,
+                    height: column.passage.start,
+                    type: "column"
+                }
+
+                let second = {
+                    x: this.columns[index].positionX,
+                    y: column.passage.finish,
+                    width: column.width,
+                    height: this.canvasHeight,
+                    type: "column"
+                }
+                newStateForColumnsForDraw.push(first)
+                newStateForColumnsForDraw.push(second)
+
+                if (this.columns.length-1 === index &&  this.columns.length <
+                    this.count && this.calculationsForColumns(this.columns[index])) {
+                    this.PushNew()
+                }
+
+            }, this)
+
+            this.columnsForDraw = newStateForColumnsForDraw
+
+        }
+
+        calculationsForColumns (column) {
+            let result = Math.trunc(this.canvasWidth - (column.positionX + column.width))
+            let count = this.canvasWidth / this.count
+            let maxBorder = count + 5
+            if(result > count && result < maxBorder) {
+                return true
+            }
+            return false
+        }
+
+    }
+
+    const canvas = document.getElementById('canvas');
+
+    let canWindow
+
+    if (canvas.getContext) {
+        canWindow = new Can(canvas.getContext('2d'), {width: window.innerWidth - 50, height: window.innerHeight - 50})
+    }
+
+        if (canWindow.status) {
+
+            let columns = new Columns(
+                canWindow.size.width,
+                canWindow.size.height,
+                canWindow.size.height / 5, // speed
+                5,
+                width = {min: 50, max: 250},
+                passage = {start: 160, finish: 300}
+            )
+
+            let bird = new Player(
+                canWindow.size.height / 2, // speed
+                canWindow.size.width,
+                canWindow.size.height,
+                40,
+                25,
+                canWindow.size.height / 2 // gravity
+
+            )
+
+            document.addEventListener('keydown', function(event){
+                if (event.defaultPrevented) {
+                    return; // Do nothing if the event was already processed
+                }
+
+                switch (event.code) {
+                    case "Space": // IE/Edge specific value
+                        if (bird.status === true) {
+                            bird.Jump()
+                        }
+                        break;
+                    case "KeyR":
+                        // Do something for "down arrow" key press.
+                        // continue restart;
+                        break;
+                    case "KeyP": // IE/Edge specific value
+                        if (Time === 1000) {
+                            Time = 0
+                        } else Time = 1000
+                        break;
+                }
+            })
+
+            document.addEventListener('touchstart', function(event){
+                if (event.touches.length === 1) {
+                    if (bird.status === true) {
+                        bird.Jump()
+                    }
+                }}, false)
+
+            columns.PushNew()
+
+             function process () {
+                 if (!bird.Status) {
+                     return
+                 }
+                 // console.log(bird)
+
+                 canWindow.update()
+                 columns.Calculating()
+                 bird.Calculation(columns.GetColumns)
+
+                 // if (bird.JumpStatus) {
+                 //     bird.status = false
+                 // }
+
+                 let draw = columns.GetDrawColumns
+                 draw.unshift(bird.ForDraw)
+                 draw.push(bird.Points)
+                 canWindow.Draw(draw)
+                 // console.log(bird.count)
+
+            }
+
+            setInterval(process, Time/CountOfFrame) // CountOfFrame
+
+    }
+
+</script>
 </body>
 </html>
