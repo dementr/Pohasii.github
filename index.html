@@ -34,7 +34,7 @@
         RestartStatus = false
         return co
     }
-    
+
 
         document.addEventListener('keydown', function(event){
             if (event.defaultPrevented) {
@@ -82,6 +82,41 @@
             //do smth
         }
     }, false)
+
+    function geRays () {
+        try {
+            let str = String.fromCharCode.apply(String, GetRays());
+            return JSON.parse(str);
+            // return obj
+            //console.log(obj)
+        } catch (e) {
+            console.log(e)
+        }
+        return []
+    }
+
+    function geScore () {
+        try {
+            let str = String.fromCharCode.apply(String, GetScore());
+            return JSON.parse(str);
+            //return obj
+            //console.log(obj)
+        } catch (e) {
+            console.log(e)
+        }
+        return []
+    }
+
+    // function print () {
+    //     console.log(` rays: ${geRays()}`)
+    //     console.log(` score: ${geScore()}`)
+    // }
+    // while (true) {
+    //     console.log(getRays ())
+    //     sleep(1000)
+    // }
+    // setInterval(print, 1000)
+    ///setTimeout(console.log(GetRays()), pause)
 
 </script>
 </body>
