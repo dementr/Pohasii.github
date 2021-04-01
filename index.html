@@ -33,14 +33,17 @@
 
     let RestartStatus = true
 
-    function ChangeJumpStatus () {
-        JumpStatus = JumpStatus !== true;
-    }
+    // dean code 01 04 2021
+    // function ChangeJumpStatus () {
+    //     JumpStatus = JumpStatus !== true;
+    // }
 
+    // it is API for wasm
     function isStatus () {
         return JumpStatus
     }
 
+    // it is API for wasm
     function Restart () {
         const co = RestartStatus
         RestartStatus = false
@@ -119,9 +122,22 @@
         return []
     }
 
+    function geStatus () {
+        try {
+            let str = String.fromCharCode.apply(String, GetStatus());
+            return JSON.parse(str);
+            //return obj
+            //console.log(obj)
+        } catch (e) {
+            console.log(e)
+        }
+        return null
+    }
+
     // function print () {
-    //     console.log(` rays: ${geRays()}`)
-    //     console.log(` score: ${geScore()}`)
+    //     // console.log(` rays: ${geRays()}`)
+    //     // console.log(` score: ${geScore()}`)
+    //     //console.log(` status: ${geStatus()}`)
     // }
     // while (true) {
     //     console.log(getRays ())
